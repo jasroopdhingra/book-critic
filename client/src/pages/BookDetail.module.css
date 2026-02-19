@@ -1,0 +1,215 @@
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.back {
+  display: inline-block;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  transition: color 0.15s;
+}
+
+.back:hover {
+  color: var(--text-secondary);
+}
+
+.bookHeader {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 48px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cover {
+  width: 96px;
+  height: 136px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  flex-shrink: 0;
+}
+
+.coverPlaceholder {
+  width: 96px;
+  height: 136px;
+  background: var(--accent-light);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Lora', serif;
+  font-size: 38px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.bookMeta {
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.author {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.date {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.stars {
+  font-size: 14px;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.ratingLabel {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Review */
+.review {
+  margin-bottom: 48px;
+}
+
+.reviewHeading {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 28px;
+}
+
+.reviewText {
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+}
+
+.noReview {
+  padding: 40px 0;
+  font-size: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Actions */
+.actions {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border-light);
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.deleteBtn:hover {
+  color: var(--danger);
+}
+
+.confirmDelete {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.confirmDelete p {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+.confirmBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.confirmYes {
+  padding: 8px 16px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.confirmYes:hover {
+  opacity: 0.85;
+}
+
+.confirmNo {
+  padding: 8px 16px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: var(--radius);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.confirmNo:hover {
+  border-color: var(--text-muted);
+}
+
+/* Loading */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 120px 0;
+}
+
+.loadingDot {
+  width: 6px;
+  height: 6px;
+  background: var(--border);
+  border-radius: 50%;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.loadingDot:nth-child(2) { animation-delay: 0.2s; }
+.loadingDot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
