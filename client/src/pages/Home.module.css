@@ -150,7 +150,7 @@
   font-style: italic;
   color: var(--text-primary);
   line-height: 1.5;
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--silver);
   padding-left: 24px;
   margin: 0;
 }
