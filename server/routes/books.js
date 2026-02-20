@@ -4,9 +4,13 @@ import db from '../db.js';
 const router = express.Router();
 
 router.get('/', (req, res) => {
+  const { username } = req.query;
+  if (!username) return res.status(400).json({ error: 'username is required' });
+
   const books = db.prepare(`
-    SELECT * FROM books ORDER BY created_at DESC
-  `).all();
+    SELECT * FROM books WHERE username = ? ORDER BY created_at DESC
+  `).all(username);
+
   res.json(books);
 });
 
@@ -17,16 +21,16 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { title, author, cover_url, open_library_key, date_finished, rating, review_text } = req.body;
+  const { username, title, author, cover_url, open_library_key, date_finished, rating, review_text } = req.body;
 
-  if (!title || !author || !date_finished) {
-    return res.status(400).json({ error: 'title, author, and date_finished are required' });
+  if (!username || !title || !author || !date_finished) {
+    return res.status(400).json({ error: 'username, title, author, and date_finished are required' });
   }
 
   const result = db.prepare(`
-    INSERT INTO books (title, author, cover_url, open_library_key, date_finished, rating, review_text)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(title, author, cover_url || null, open_library_key || null, date_finished, rating || null, review_text || null);
+    INSERT INTO books (username, title, author, cover_url, open_library_key, date_finished, rating, review_text)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(username, title, author, cover_url || null, open_library_key || null, date_finished, rating || null, review_text || null);
 
   const book = db.prepare('SELECT * FROM books WHERE id = ?').get(result.lastInsertRowid);
   res.status(201).json(book);

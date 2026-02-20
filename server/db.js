@@ -8,6 +8,7 @@ const db = new Database(path.join(__dirname, 'bookshelf.db'));
 db.exec(`
   CREATE TABLE IF NOT EXISTS books (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
     title TEXT NOT NULL,
     author TEXT NOT NULL,
     cover_url TEXT,
@@ -17,13 +18,7 @@ db.exec(`
     review_text TEXT,
     created_at TEXT DEFAULT (datetime('now'))
   );
+  CREATE INDEX IF NOT EXISTS idx_books_username ON books(username);
 `);
-
-// Migrate existing DBs that predate review_text
-try {
-  db.exec(`ALTER TABLE books ADD COLUMN review_text TEXT`);
-} catch {
-  // column already exists
-}
 
 export default db;

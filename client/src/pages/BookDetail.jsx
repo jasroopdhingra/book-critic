@@ -16,13 +16,13 @@ export default function BookDetail() {
   useEffect(() => {
     getBook(id)
       .then(setBook)
-      .catch(() => navigate('/'))
+      .catch(() => navigate('/shelf'))
       .finally(() => setLoading(false));
   }, [id, navigate]);
 
   const handleDelete = async () => {
     await deleteBook(id);
-    navigate('/');
+    navigate('/shelf');
   };
 
   if (loading) {

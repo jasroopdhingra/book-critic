@@ -1,13 +1,17 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useBooks } from '../hooks/useBooks';
+import { useBooks, clearUsername } from '../hooks/useBooks';
 import Logo from './Logo';
 import styles from './Nav.module.css';
 
-export default function Nav() {
-  const location = useLocation();
+export default function Nav({ username, onSwitchUser }) {
   const { books } = useBooks();
-
+  const location = useLocation();
   const isActive = (path) => location.pathname === path;
+
+  const handleSwitch = () => {
+    clearUsername();
+    onSwitchUser();
+  };
 
   return (
     <nav className={styles.nav}>
@@ -19,6 +23,9 @@ export default function Nav() {
           <span className={`${styles.logoText} serif`}>Bookshelf</span>
         </Link>
         <div className={styles.links}>
+          <button className={styles.user} onClick={handleSwitch} title="Switch user">
+            {username}
+          </button>
           <Link
             to="/shelf"
             className={`${styles.link} ${isActive('/shelf') ? styles.active : ''}`}

@@ -3,15 +3,29 @@ import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
+export function getUsername() {
+  return localStorage.getItem('username') || null;
+}
+
+export function setUsername(name) {
+  localStorage.setItem('username', name.trim().toLowerCase());
+}
+
+export function clearUsername() {
+  localStorage.removeItem('username');
+}
+
 export function useBooks() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchBooks = useCallback(async () => {
+    const username = getUsername();
+    if (!username) { setLoading(false); return; }
     try {
       setLoading(true);
-      const { data } = await axios.get(`${API}/books`);
+      const { data } = await axios.get(`${API}/books`, { params: { username } });
       setBooks(data);
     } catch (err) {
       setError(err.message);
@@ -20,20 +34,19 @@ export function useBooks() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchBooks();
-  }, [fetchBooks]);
+  useEffect(() => { fetchBooks(); }, [fetchBooks]);
 
-  const addBook = async (bookData) => {
-    const { data } = await axios.post(`${API}/books`, bookData);
+  const addBook = useCallback(async (bookData) => {
+    const username = getUsername();
+    const { data } = await axios.post(`${API}/books`, { ...bookData, username });
     setBooks(prev => [data, ...prev]);
     return data;
-  };
+  }, []);
 
-  const deleteBook = async (id) => {
+  const deleteBook = useCallback(async (id) => {
     await axios.delete(`${API}/books/${id}`);
     setBooks(prev => prev.filter(b => b.id !== id));
-  };
+  }, []);
 
   return { books, loading, error, addBook, deleteBook, refetch: fetchBooks };
 }
