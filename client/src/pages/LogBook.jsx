@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useBooks, sendAiMessage, synthesizeReview } from '../hooks/useBooks';
+import { useBooks, sendAiMessage, synthesizeReview, regenerateQuestion } from '../hooks/useBooks';
 import styles from './LogBook.module.css';
 
 const STEPS = { SEARCH: 'search', CONFIRM: 'confirm', CHAT: 'chat', SYNTHESIZING: 'synthesizing', RATE: 'rate' };
 
-async function searchBooks(query) {
+async function searchBooks(query, limit = 6) {
   const { data } = await axios.get(
-    `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=6&fields=key,title,author_name,cover_i,first_publish_year`
+    `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=${limit}&fields=key,title,author_name,cover_i,first_publish_year`
   );
   return data.docs.map(doc => ({
     key: doc.key,
@@ -27,9 +27,15 @@ export default function LogBook() {
 
   const [step, setStep] = useState(STEPS.SEARCH);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
+  const [dropdown, setDropdown] = useState([]);
+  const [dropdownLoading, setDropdownLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [noResults, setNoResults] = useState(false);
   const [searching, setSearching] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
+  const searchWrapperRef = useRef(null);
+  const debounceRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -52,21 +58,66 @@ export default function LogBook() {
     }
   }, [step, messages]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchWrapperRef.current && !searchWrapperRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Debounced live search for dropdown
+  const handleQueryChange = (e) => {
+    const val = e.target.value;
+    setQuery(val);
+    setNoResults(false);
+    setSearchResults([]);
+
+    clearTimeout(debounceRef.current);
+    if (val.trim().length < 2) {
+      setDropdown([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    setDropdownLoading(true);
+    setShowDropdown(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const books = await searchBooks(val, 6);
+        setDropdown(books);
+      } catch {
+        setDropdown([]);
+      } finally {
+        setDropdownLoading(false);
+      }
+    }, 300);
+  };
+
+  // Explicit search button
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!query.trim()) return;
+    setShowDropdown(false);
     setSearching(true);
+    setNoResults(false);
     try {
-      const books = await searchBooks(query);
-      setResults(books);
+      const books = await searchBooks(query, 8);
+      setSearchResults(books);
+      if (books.length === 0) setNoResults(true);
     } catch {
-      setResults([]);
+      setSearchResults([]);
+      setNoResults(true);
     } finally {
       setSearching(false);
     }
   };
 
   const handleSelectBook = (book) => {
+    setShowDropdown(false);
     setSelectedBook(book);
     setStep(STEPS.CONFIRM);
   };
@@ -133,6 +184,22 @@ export default function LogBook() {
     }
   };
 
+  const handleRegenerate = async () => {
+    if (aiLoading) return;
+    // Remove last assistant message and request a fresh one
+    const withoutLast = messages.slice(0, -1);
+    setMessages(withoutLast);
+    setAiLoading(true);
+    try {
+      const reply = await regenerateQuestion(selectedBook, withoutLast);
+      setMessages([...withoutLast, { role: 'assistant', content: reply }]);
+    } catch {
+      setMessages(messages); // restore on failure
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const goToRate = async () => {
     setStep(STEPS.SYNTHESIZING);
     try {
@@ -178,22 +245,58 @@ export default function LogBook() {
           <h1 className={`${styles.heading} serif`}>What did you just finish?</h1>
           <p className={styles.sub}>Search for your book to get started.</p>
           <form onSubmit={handleSearch} className={styles.searchForm}>
-            <input
-              className={styles.searchInput}
-              type="text"
-              placeholder="Title or author..."
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              autoFocus
-            />
+            <div className={styles.searchInputWrap} ref={searchWrapperRef}>
+              <input
+                className={styles.searchInput}
+                type="text"
+                placeholder="Title or author..."
+                value={query}
+                onChange={handleQueryChange}
+                onFocus={() => dropdown.length > 0 && setShowDropdown(true)}
+                autoComplete="off"
+                autoFocus
+              />
+              {showDropdown && (
+                <div className={styles.dropdown}>
+                  {dropdownLoading ? (
+                    <div className={styles.dropdownLoading}>
+                      <span /><span /><span />
+                    </div>
+                  ) : dropdown.length > 0 ? (
+                    dropdown.map((book, i) => (
+                      <button
+                        key={`${book.key}-${i}`}
+                        type="button"
+                        className={styles.dropdownItem}
+                        onMouseDown={() => handleSelectBook(book)}
+                      >
+                        {book.cover_url ? (
+                          <img src={book.cover_url} alt={book.title} className={styles.resultCover} />
+                        ) : (
+                          <div className={styles.resultCoverPlaceholder}>
+                            <span>{book.title[0]}</span>
+                          </div>
+                        )}
+                        <div className={styles.resultInfo}>
+                          <span className={styles.resultTitle}>{book.title}</span>
+                          <span className={styles.resultAuthor}>{book.author}{book.year ? ` · ${book.year}` : ''}</span>
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <p className={styles.dropdownEmpty}>No matches yet...</p>
+                  )}
+                </div>
+              )}
+            </div>
             <button className={styles.searchBtn} type="submit" disabled={searching}>
               {searching ? '...' : 'Search'}
             </button>
           </form>
 
-          {results.length > 0 && (
+          {searchResults.length > 0 && (
             <div className={styles.results}>
-              {results.map((book, i) => (
+              {searchResults.map((book, i) => (
                 <button
                   key={`${book.key}-${i}`}
                   className={styles.resultItem}
@@ -215,7 +318,7 @@ export default function LogBook() {
             </div>
           )}
 
-          {results.length === 0 && query && !searching && (
+          {noResults && (
             <p className={styles.noResults}>No results found. Try a different search.</p>
           )}
         </div>
@@ -269,16 +372,30 @@ export default function LogBook() {
           </div>
 
           <div className={styles.chatMessages}>
-            {messages.map((msg, i) => (
-              <div key={i} className={`${styles.message} ${styles[msg.role]}`}>
-                {msg.role === 'assistant' && (
-                  <div className={styles.aiLabel}>Reflection</div>
-                )}
-                <p className={msg.role === 'assistant' ? `${styles.messageText} serif` : styles.messageText}>
-                  {msg.content}
-                </p>
-              </div>
-            ))}
+            {messages.map((msg, i) => {
+              const isLastAssistant = msg.role === 'assistant' && i === messages.length - 1;
+              const hasUserReplied = messages.slice(i + 1).some(m => m.role === 'user');
+              const canRegenerate = isLastAssistant && !hasUserReplied && !chatDone;
+              return (
+                <div key={i} className={`${styles.message} ${styles[msg.role]}`}>
+                  {msg.role === 'assistant' && (
+                    <div className={styles.aiLabel}>Reflection</div>
+                  )}
+                  <p className={msg.role === 'assistant' ? `${styles.messageText} serif` : styles.messageText}>
+                    {msg.content}
+                  </p>
+                  {canRegenerate && (
+                    <button
+                      className={styles.regenerateBtn}
+                      onClick={handleRegenerate}
+                      disabled={aiLoading}
+                    >
+                      ↻ different question
+                    </button>
+                  )}
+                </div>
+              );
+            })}
             {aiLoading && (
               <div className={`${styles.message} ${styles.assistant}`}>
                   <div className={styles.aiLabel}>Reflection</div>

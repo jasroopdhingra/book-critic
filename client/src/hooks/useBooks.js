@@ -48,6 +48,11 @@ export async function sendAiMessage(book, messages) {
   return data.reply;
 }
 
+export async function regenerateQuestion(book, messages) {
+  const { data } = await axios.post(`${API}/ai/regenerate`, { book, messages });
+  return data.reply;
+}
+
 export async function synthesizeReview(book, exchanges) {
   const { data } = await axios.post(`${API}/ai/synthesize`, { book, exchanges });
   return data.review;

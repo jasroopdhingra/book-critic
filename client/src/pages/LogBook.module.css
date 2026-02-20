@@ -48,7 +48,7 @@
 }
 
 .searchInput {
-  flex: 1;
+  width: 100%;
   padding: 11px 16px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -57,6 +57,7 @@
   color: var(--text-primary);
   outline: none;
   transition: border-color 0.15s;
+  box-sizing: border-box;
 }
 
 .searchInput:focus {
@@ -76,6 +77,7 @@
   font-size: 14px;
   font-weight: 500;
   transition: background 0.15s;
+  flex-shrink: 0;
 }
 
 .searchBtn:hover:not(:disabled) {
@@ -84,6 +86,75 @@
 
 .searchBtn:disabled {
   opacity: 0.6;
+}
+
+/* Search input wrapper + dropdown */
+.searchInputWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  z-index: 50;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: white;
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s;
+  width: 100%;
+}
+
+.dropdownItem:last-child {
+  border-bottom: none;
+}
+
+.dropdownItem:hover {
+  background: var(--bg);
+}
+
+.dropdownLoading {
+  display: flex;
+  gap: 5px;
+  padding: 14px 16px;
+  align-items: center;
+}
+
+.dropdownLoading span {
+  width: 5px;
+  height: 5px;
+  background: var(--border);
+  border-radius: 50%;
+  animation: bounce 1.2s ease-in-out infinite;
+}
+
+.dropdownLoading span:nth-child(2) { animation-delay: 0.15s; }
+.dropdownLoading span:nth-child(3) { animation-delay: 0.3s; }
+
+.dropdownEmpty {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 /* Results */
@@ -430,6 +501,28 @@
 }
 
 .sendBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.regenerateBtn {
+  display: inline-block;
+  margin-top: 8px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+  letter-spacing: 0.01em;
+}
+
+.regenerateBtn:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.regenerateBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }

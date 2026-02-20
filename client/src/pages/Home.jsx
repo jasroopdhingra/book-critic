@@ -2,24 +2,6 @@ import { Link } from 'react-router-dom';
 import { useBooks } from '../hooks/useBooks';
 import styles from './Home.module.css';
 
-const STEPS = [
-  {
-    number: '01',
-    title: 'Log a book',
-    description: 'Search for the book you just finished and confirm it. Takes ten seconds.',
-  },
-  {
-    number: '02',
-    title: 'Reflect with AI',
-    description: 'An AI leads you through a short, thoughtful conversation — not a quiz. Just questions worth sitting with.',
-  },
-  {
-    number: '03',
-    title: 'Your review, in your words',
-    description: 'Your answers become a real review, written in your voice. It lives on your shelf, permanently.',
-  },
-];
-
 export default function Home() {
   const { books } = useBooks();
   const hasBooks = books.length > 0;
@@ -28,7 +10,7 @@ export default function Home() {
     <div className={styles.page}>
       {/* Hero */}
       <section className={styles.hero}>
-        <p className={styles.eyebrow}>A reading journal for people who think</p>
+        <p className={styles.eyebrow}>A Reading Journal</p>
         <h1 className={`${styles.headline} serif`}>
           Every book you finish<br />deserves more than a rating.
         </h1>
@@ -44,25 +26,6 @@ export default function Home() {
               My shelf ({books.length})
             </Link>
           )}
-        </div>
-      </section>
-
-      {/* Divider */}
-      <div className={styles.divider} />
-
-      {/* How it works */}
-      <section className={styles.steps}>
-        <p className={styles.sectionLabel}>How it works</p>
-        <div className={styles.stepList}>
-          {STEPS.map(step => (
-            <div key={step.number} className={styles.step}>
-              <span className={styles.stepNumber}>{step.number}</span>
-              <div>
-                <h3 className={`${styles.stepTitle} serif`}>{step.title}</h3>
-                <p className={styles.stepDesc}>{step.description}</p>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 
