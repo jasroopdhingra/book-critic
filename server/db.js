@@ -3,10 +3,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = process.env.NODE_ENV === 'production'
-  ? '/data/bookshelf.db'
-  : path.join(__dirname, 'bookshelf.db');
-const db = new Database(dbPath);
+const db = new Database(path.join(__dirname, 'bookshelf.db'));
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS books (

@@ -10,7 +10,3 @@ services:
         value: production
       - key: GROQ_API_KEY
         sync: false
-    disk:
-      name: bookshelf-db
-      mountPath: /data
-      sizeGB: 1
