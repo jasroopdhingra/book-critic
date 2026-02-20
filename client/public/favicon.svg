@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background -->
+  <rect width="32" height="32" rx="8" fill="#F9F7F4"/>
+  <!-- Left page -->
+  <path d="M16 7C14.2 5.8 11.8 5 9 5C7.2 5 5.6 5.4 4 6V23C5.6 22.4 7.2 22 9 22C11.8 22 14.2 22.8 16 24" stroke="#5B7FA6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Right page -->
+  <path d="M16 7C17.8 5.8 20.2 5 23 5C24.8 5 26.4 5.4 28 6V23C26.4 22.4 24.8 22 23 22C20.2 22 17.8 22.8 16 24" stroke="#5B7FA6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Spine -->
+  <line x1="16" y1="7" x2="16" y2="24" stroke="#5B7FA6" stroke-width="2" stroke-linecap="round"/>
+</svg>
