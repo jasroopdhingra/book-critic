@@ -1,15 +1,15 @@
 services:
   - type: web
-    name: book-critic-api
+    name: book-critic
     runtime: node
     rootDir: .
-    buildCommand: npm install
+    buildCommand: npm install && cd client && npm install && npm run build
     startCommand: node server/index.js
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: GROQ_API_KEY
         sync: false
-      - key: PORT
-        value: 3001
     disk:
       name: bookshelf-db
       mountPath: /data
