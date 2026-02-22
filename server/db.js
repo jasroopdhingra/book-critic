@@ -8,7 +8,7 @@ const db = new Database(path.join(__dirname, 'bookshelf.db'));
 db.exec(`
   CREATE TABLE IF NOT EXISTS books (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL,
+    username TEXT NOT NULL DEFAULT 'default',
     title TEXT NOT NULL,
     author TEXT NOT NULL,
     cover_url TEXT,
@@ -20,5 +20,9 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_books_username ON books(username);
 `);
+
+// Migrate existing DBs without username column
+try { db.exec(`ALTER TABLE books ADD COLUMN username TEXT NOT NULL DEFAULT 'default'`); } catch {}
+try { db.exec(`CREATE INDEX IF NOT EXISTS idx_books_username ON books(username)`); } catch {}
 
 export default db;

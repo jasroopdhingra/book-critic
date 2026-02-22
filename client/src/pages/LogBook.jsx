@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useBooks, sendAiMessage, synthesizeReview, regenerateQuestion } from '../hooks/useBooks';
 import styles from './LogBook.module.css';
 
-const STEPS = { SEARCH: 'search', CONFIRM: 'confirm', CHAT: 'chat', SYNTHESIZING: 'synthesizing', RATE: 'rate' };
+const STEPS = { SEARCH: 'search', CONFIRM: 'confirm', CHAT: 'chat', SYNTHESIZING: 'synthesizing', RATE: 'rate', STAMPED: 'stamped' };
 
 async function searchBooks(query, limit = 6) {
   const { data } = await axios.get(
@@ -228,7 +228,9 @@ export default function LogBook() {
         rating: rating || null,
         review_text: reviewText || null,
       });
-      navigate(`/book/${book.id}`);
+      // Show stamp, then navigate
+      setStep(STEPS.STAMPED);
+      setTimeout(() => navigate(`/book/${book.id}`), 2200);
     } catch (err) {
       console.error(err);
       setSaving(false);
@@ -490,6 +492,17 @@ export default function LogBook() {
             <button className={styles.ghostBtn} onClick={handleSave} disabled={saving}>
               Skip rating
             </button>
+          </div>
+        </div>
+      )}
+      {/* STAMPED */}
+      {step === STEPS.STAMPED && (
+        <div className={styles.stampOverlay}>
+          <div className={styles.stampWrap}>
+            <div className={styles.stamp}>
+              <span className={styles.stampText}>shelved.</span>
+              <span className={styles.stampTitle}>{selectedBook?.title}</span>
+            </div>
           </div>
         </div>
       )}
