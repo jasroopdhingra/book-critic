@@ -14,11 +14,11 @@ export default function Home() {
         <h1 className={`${styles.headline} serif`}>
           What did<br />
           this book<br />
-          do to you?
+          mean to you?
         </h1>
 
         <p className={styles.sub}>
-          Finish a book. Reflect on it. Keep a record that's actually yours.
+          Finish a book and write a meaningful reflection. Save it to your bookshelf.
         </p>
 
         <div className={styles.ctas}>
@@ -34,7 +34,7 @@ export default function Home() {
       </div>
 
       <p className={styles.footnote}>
-        an AI guides the reflection &middot; the words are yours
+        an AI guides the reflection &middot; helping you craft meaningful thoughts.
       </p>
     </div>
   );
