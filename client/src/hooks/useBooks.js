@@ -1,52 +1,52 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { useAuth } from '@clerk/clerk-react';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-export function getUsername() {
-  return localStorage.getItem('username') || null;
-}
-
-export function setUsername(name) {
-  localStorage.setItem('username', name.trim().toLowerCase());
-}
-
-export function clearUsername() {
-  localStorage.removeItem('username');
+function authHeaders(token) {
+  return { Authorization: `Bearer ${token}` };
 }
 
 export function useBooks() {
+  const { getToken } = useAuth();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchBooks = useCallback(async () => {
-    const username = getUsername();
-    if (!username) { setLoading(false); return; }
     try {
       setLoading(true);
-      const { data } = await axios.get(`${API}/books`, { params: { username } });
+      const token = await getToken();
+      const { data } = await axios.get(`${API}/books`, {
+        headers: authHeaders(token),
+      });
       setBooks(data);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getToken]);
 
   useEffect(() => { fetchBooks(); }, [fetchBooks]);
 
   const addBook = useCallback(async (bookData) => {
-    const username = getUsername();
-    const { data } = await axios.post(`${API}/books`, { ...bookData, username });
+    const token = await getToken();
+    const { data } = await axios.post(`${API}/books`, bookData, {
+      headers: authHeaders(token),
+    });
     setBooks(prev => [data, ...prev]);
     return data;
-  }, []);
+  }, [getToken]);
 
   const deleteBook = useCallback(async (id) => {
-    await axios.delete(`${API}/books/${id}`);
+    const token = await getToken();
+    await axios.delete(`${API}/books/${id}`, {
+      headers: authHeaders(token),
+    });
     setBooks(prev => prev.filter(b => b.id !== id));
-  }, []);
+  }, [getToken]);
 
   return { books, loading, error, addBook, deleteBook, refetch: fetchBooks };
 }
@@ -56,17 +56,23 @@ export async function getBook(id) {
   return data;
 }
 
-export async function sendAiMessage(book, messages) {
-  const { data } = await axios.post(`${API}/ai/chat`, { book, messages });
+export async function sendAiMessage(book, messages, token) {
+  const { data } = await axios.post(`${API}/ai/chat`, { book, messages }, {
+    headers: authHeaders(token),
+  });
   return data.reply;
 }
 
-export async function regenerateQuestion(book, messages) {
-  const { data } = await axios.post(`${API}/ai/regenerate`, { book, messages });
+export async function regenerateQuestion(book, messages, token) {
+  const { data } = await axios.post(`${API}/ai/regenerate`, { book, messages }, {
+    headers: authHeaders(token),
+  });
   return data.reply;
 }
 
-export async function synthesizeReview(book, exchanges) {
-  const { data } = await axios.post(`${API}/ai/synthesize`, { book, exchanges });
+export async function synthesizeReview(book, exchanges, token) {
+  const { data } = await axios.post(`${API}/ai/synthesize`, { book, exchanges }, {
+    headers: authHeaders(token),
+  });
   return data.review;
 }

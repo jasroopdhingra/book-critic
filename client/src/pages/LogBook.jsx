@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@clerk/clerk-react';
 import axios from 'axios';
 import { useBooks, sendAiMessage, synthesizeReview, regenerateQuestion } from '../hooks/useBooks';
 import styles from './LogBook.module.css';
@@ -23,6 +24,7 @@ async function searchBooks(query, limit = 6) {
 
 export default function LogBook() {
   const navigate = useNavigate();
+  const { getToken } = useAuth();
   const { addBook } = useBooks();
 
   const [step, setStep] = useState(STEPS.SEARCH);
@@ -126,7 +128,8 @@ export default function LogBook() {
     setStep(STEPS.CHAT);
     setAiLoading(true);
     try {
-      const opening = await sendAiMessage(selectedBook, []);
+      const token = await getToken();
+      const opening = await sendAiMessage(selectedBook, [], token);
       setMessages([{ role: 'assistant', content: opening }]);
     } catch {
       setMessages([{ role: 'assistant', content: "What stayed with you after the last page?" }]);
@@ -145,7 +148,8 @@ export default function LogBook() {
     setAiLoading(true);
 
     try {
-      const reply = await sendAiMessage(selectedBook, newMessages);
+      const token = await getToken();
+      const reply = await sendAiMessage(selectedBook, newMessages, token);
 
       if (reply.includes('REVIEW_COMPLETE')) {
         const cleanReply = reply.replace('REVIEW_COMPLETE', '').trim();
@@ -186,12 +190,12 @@ export default function LogBook() {
 
   const handleRegenerate = async () => {
     if (aiLoading) return;
-    // Remove last assistant message and request a fresh one
     const withoutLast = messages.slice(0, -1);
     setMessages(withoutLast);
     setAiLoading(true);
     try {
-      const reply = await regenerateQuestion(selectedBook, withoutLast);
+      const token = await getToken();
+      const reply = await regenerateQuestion(selectedBook, withoutLast, token);
       setMessages([...withoutLast, { role: 'assistant', content: reply }]);
     } catch {
       setMessages(messages); // restore on failure
@@ -203,7 +207,8 @@ export default function LogBook() {
   const goToRate = async () => {
     setStep(STEPS.SYNTHESIZING);
     try {
-      const review = await synthesizeReview(selectedBook, messages);
+      const token = await getToken();
+      const review = await synthesizeReview(selectedBook, messages, token);
       setReviewText(review);
     } catch {
       // fall back to joining user answers as plain text

@@ -2,5 +2,6 @@ node_modules/
 client/node_modules/
 server/bookshelf.db
 .env
+client/.env.local
 dist/
 client/dist/

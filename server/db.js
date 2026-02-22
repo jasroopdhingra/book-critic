@@ -18,10 +18,9 @@ db.exec(`
     review_text TEXT,
     created_at TEXT DEFAULT (datetime('now'))
   );
-  CREATE INDEX IF NOT EXISTS idx_books_username ON books(username);
 `);
 
-// Migrate existing DBs without username column
+// Migrate existing DBs: add username column if missing, then index
 try { db.exec(`ALTER TABLE books ADD COLUMN username TEXT NOT NULL DEFAULT 'default'`); } catch {}
 try { db.exec(`CREATE INDEX IF NOT EXISTS idx_books_username ON books(username)`); } catch {}
 

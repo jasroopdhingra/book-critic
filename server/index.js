@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { clerkMiddleware, requireAuth } from '@clerk/express';
 import booksRouter from './routes/books.js';
 import aiRouter from './routes/ai.js';
 
@@ -10,13 +11,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://book-critic.onrender.com'],
+  credentials: true,
+}));
 app.use(express.json());
+app.use(clerkMiddleware());
 
-app.use('/api/books', booksRouter);
-app.use('/api/ai', aiRouter);
+app.use('/api/books', requireAuth(), booksRouter);
+app.use('/api/ai', requireAuth(), aiRouter);
 
-// Serve built React app in production
 if (process.env.NODE_ENV === 'production') {
   const clientDist = path.join(__dirname, '../client/dist');
   app.use(express.static(clientDist));
