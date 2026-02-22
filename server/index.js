@@ -18,6 +18,7 @@ app.use(cors({
 app.use(express.json());
 app.use(clerkMiddleware());
 
+app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api/books', requireAuth(), booksRouter);
 app.use('/api/ai', requireAuth(), aiRouter);
 

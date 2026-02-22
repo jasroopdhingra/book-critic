@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '@clerk/clerk-react';
 import { getBook, useBooks } from '../hooks/useBooks';
 import styles from './BookDetail.module.css';
 
@@ -8,17 +9,18 @@ const STAR_LABELS = ['', 'not for me', 'it was ok', 'liked it', 'really liked it
 export default function BookDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { getToken } = useAuth();
   const { deleteBook } = useBooks();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    getBook(id)
+    getToken().then(token => getBook(id, token))
       .then(setBook)
       .catch(() => navigate('/shelf'))
       .finally(() => setLoading(false));
-  }, [id, navigate]);
+  }, [id, navigate, getToken]);
 
   const handleDelete = async () => {
     await deleteBook(id);

@@ -51,8 +51,10 @@ export function useBooks() {
   return { books, loading, error, addBook, deleteBook, refetch: fetchBooks };
 }
 
-export async function getBook(id) {
-  const { data } = await axios.get(`${API}/books/${id}`);
+export async function getBook(id, token) {
+  const { data } = await axios.get(`${API}/books/${id}`, {
+    headers: authHeaders(token),
+  });
   return data;
 }
 
