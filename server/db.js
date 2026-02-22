@@ -1,14 +1,14 @@
-import Database from 'better-sqlite3';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { createClient } from '@libsql/client';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const db = new Database(path.join(__dirname, 'bookshelf.db'));
+const db = createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
 
-db.exec(`
+await db.execute(`
   CREATE TABLE IF NOT EXISTS books (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL DEFAULT 'default',
+    username TEXT NOT NULL,
     title TEXT NOT NULL,
     author TEXT NOT NULL,
     cover_url TEXT,
@@ -17,11 +17,11 @@ db.exec(`
     rating INTEGER,
     review_text TEXT,
     created_at TEXT DEFAULT (datetime('now'))
-  );
+  )
 `);
 
-// Migrate existing DBs: add username column if missing, then index
-try { db.exec(`ALTER TABLE books ADD COLUMN username TEXT NOT NULL DEFAULT 'default'`); } catch {}
-try { db.exec(`CREATE INDEX IF NOT EXISTS idx_books_username ON books(username)`); } catch {}
+await db.execute(`
+  CREATE INDEX IF NOT EXISTS idx_books_username ON books(username)
+`);
 
 export default db;
