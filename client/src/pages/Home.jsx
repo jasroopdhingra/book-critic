@@ -8,47 +8,34 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      {/* Hero */}
-      <section className={styles.hero}>
-        <p className={styles.eyebrow}>A Reading Journal</p>
+      <div className={styles.center}>
+        <p className={styles.eyebrow}>a reading journal</p>
+
         <h1 className={`${styles.headline} serif`}>
-          Every book you finish<br />deserves more than a rating.
+          What did<br />
+          this book<br />
+          do to you?
         </h1>
+
         <p className={styles.sub}>
-          Log what you read. Reflect on what it meant. Build a shelf that captures how books actually changed you.
+          Finish a book. Reflect on it. Keep a record that's actually yours.
         </p>
-        <div className={styles.heroCtas}>
-          <Link to="/log" className={styles.primaryCta}>
+
+        <div className={styles.ctas}>
+          <Link to="/log" className={styles.primary}>
             Log a book
           </Link>
           {hasBooks && (
-            <Link to="/shelf" className={styles.secondaryCta}>
-              My shelf ({books.length})
+            <Link to="/shelf" className={styles.secondary}>
+              My shelf →
             </Link>
           )}
         </div>
-      </section>
+      </div>
 
-      {/* Divider */}
-      <div className={styles.divider} />
-
-      {/* Philosophy */}
-      <section className={styles.philosophy}>
-        <blockquote className={`${styles.quote} serif`}>
-          "A book is not finished when you read the last page — it's finished when you understand what it did to you."
-        </blockquote>
-        <div className={styles.philosophyBody}>
-          <p>
-            Most apps let you track books. This one helps you understand them. The difference is the conversation in the middle — a few carefully chosen questions that pull out what actually stayed with you.
-          </p>
-          <p>
-            The result isn't a summary. It's a record of what a book was to <em>you</em>, at the time you read it.
-          </p>
-        </div>
-        <Link to="/log" className={styles.primaryCta}>
-          Start with a book you just finished →
-        </Link>
-      </section>
+      <p className={styles.footnote}>
+        an AI guides the reflection &middot; the words are yours
+      </p>
     </div>
   );
 }
