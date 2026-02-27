@@ -21,10 +21,10 @@ Log a book you just finished, answer a few thoughtful questions guided by AI, an
 
 - **Frontend** — React + Vite, CSS Modules
 - **Backend** — Node.js + Express
-- **Database** — SQLite via `better-sqlite3`
+- **Database** — Turso (libSQL)
 - **AI** — Groq API (Llama 3.3 70B)
 - **Book data** — Open Library API (free, no key required)
-- **Deployed** — Render (full-stack, single URL)
+- **Deployed** — Vercel (frontend + serverless API)
 
 ---
 
@@ -63,14 +63,14 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ---
 
-## Deploying to Render
+## Deploying to Vercel
 
-The repo includes a `render.yaml`. To deploy:
-
-1. Push to GitHub
-2. Go to [render.com](https://render.com) → New → Web Service → connect repo
-3. Set the following in Render dashboard settings:
-   - **Build command:** `npm install && cd client && npm install && npm run build`
-   - **Start command:** `node server/index.js`
-   - **Environment variable:** `GROQ_API_KEY` → your Groq key
-4. Deploy
+1. Push to GitHub and connect the repo at [vercel.com](https://vercel.com)
+2. Add these environment variables in Vercel → Settings → Environment Variables:
+   - `GROQ_API_KEY` — your Groq API key
+   - `TURSO_DATABASE_URL` — your Turso database URL
+   - `TURSO_AUTH_TOKEN` — your Turso auth token
+   - `CLERK_SECRET_KEY` — from Clerk dashboard (for backend auth)
+   - `VITE_CLERK_PUBLISHABLE_KEY` — from Clerk (for frontend, add to Production)
+3. Deploy — Vercel will use the `vercel.json` config automatically
+4. Add your Vercel URL (e.g. `https://your-app.vercel.app`) to Clerk’s allowed origins
