@@ -4,7 +4,7 @@ A reading journal that turns your reflections into real reviews.
 
 Log a book you just finished, answer a few thoughtful questions guided by AI, and get a personal review — written in your own voice — saved to your shelf permanently.
 
-**Live:** [book-critic.onrender.com](https://book-critic.onrender.com)
+**Live:** https://book-critic-pearl.vercel.app/
 
 ---
 
